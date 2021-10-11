@@ -24,10 +24,10 @@ services:
     ports:
       - '3000:3000'
     volumes:
-      - .:/xxx8110io:cached
+      - .:/x8110io:cached
       - bundle:/usr/local/bundle:delegated
-      - node_modules:/xxx8110io/node_modules
-      - tmp-data:/xxx8110io/tmp/sockets
+      - node_modules:/x8110io/node_modules
+      - tmp-data:/x8110io/tmp/sockets
 
 volumes:
   mysql:
