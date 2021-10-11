@@ -25,7 +25,7 @@ module Api
         same_holding.update(quantity: same_holding.quantity += new_holding.quantity)
 
         # この処理をupdate時にするかは要検討
-        same_holding.fetch_current_dividend
+        # same_holding.fetch_current_dividend
 
         render status: :ok, json: same_holding
 
