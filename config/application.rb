@@ -19,7 +19,7 @@ require "action_cable/engine"
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
 
-module Xxx8110io
+module X8110io
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 6.0
@@ -33,5 +33,28 @@ module Xxx8110io
     # Middleware like session, flash, cookies can be added back manually.
     # Skip views, helpers and assets when generating a new resource.
     config.api_only = true
+
+    #devise_token_authの設定
+    config.middleware.insert_before 0, Rack::Cors do
+      allow do
+        origins '*'
+        resource '*',
+                  :headers => :any,
+                  :expose => ['access-token', 'expiry', 'token-type', 'uid', 'client'],
+                  :methods => [:get, :post, :options, :delete, :put]
+      end
+    end
+
+    #RSpecのFile生成設定
+    config.generators do |g|
+      g.test_framework :rspec,
+                        fixtures: false,
+                        view_specs: false,
+                        helper_specs: false,
+                        routing_specs: false,
+                        controller_specs: false,
+                        request_specs: true
+      g.fixture_replacement :factory_bot, dir: "spec/factories"
+    end
   end
 end
