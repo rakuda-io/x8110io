@@ -1,0 +1,67 @@
+require:
+  - rubocop-rails
+  - rubocop-rspec
+
+inherit_from:
+  - config/rubocop/rspec.yml
+
+AllCops:
+  # Rubyバージョン指定
+  TargetRubyVersion: 2.7.2
+  # 新しい規約が登録された場合に、適用するかどうかの判定
+  NewCops: enable
+  # 除外
+  Exclude:
+    - 'config.ru'
+    - 'bin/**'
+    - 'lib/**'
+    - 'node_modules/**/*'
+    - 'db/**/*'
+    - 'config/**/*'
+    - 'script/**/*'
+    - 'vendor/**/*'
+    - 'Gemfile'
+    - 'spec/rails_helper.rb'
+    - 'spec/spec_helper.rb'
+    - !ruby/regexp /old_and_unused\.rb$/
+
+# 日本語でのコメントを許可
+AsciiComments:
+  Enabled: false
+
+# クラスのコメント必須を無視
+Documentation:
+  Enabled: false
+
+# モジュール名::クラス名の定義を許可
+ClassAndModuleChildren:
+  Enabled: false
+
+# 文字リテラルのイミュータブル宣言を無視（freezeになるのはRuby3以降）
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
+# クラスのコメント必須を無視
+Style/Documentation:
+  Enabled: false
+
+# "Prefer single-quoted strings when you don't need string interpolation or special symbols."を無効
+Style/StringLiterals:
+  Enabled: false
+
+# abc判定の基準値を15→20に変更
+Metrics/AbcSize:
+  Max: 20
+
+# "Line is too long"を無効
+Layout/LineLength:
+  Enabled: false
+
+# spec_fileのみブロックの長さの警告を無視
+Metrics/BlockLength:
+  Exclude:
+    - 'spec/**/*'
+
+Metrics/MethodLength:
+  CountComments: false
+  Max: 20
