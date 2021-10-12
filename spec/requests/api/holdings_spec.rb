@@ -34,7 +34,7 @@ RSpec.describe 'Holdings API', type: :request do
         before { get "#{base_url}#{another_user[:id]}/holdings", headers: tokens }
 
         it '権限がなく保有株一覧が取得できないこと' do
-          expect(JSON.parse(response.body)['errors']).to include('Access denied! No match your user id')
+          expect(JSON.parse(response.body)['errors']).to include('Your access denied! No match your user id')
         end
 
         it 'HTTPステータスが401である(アクセス権がない)こと' do
@@ -82,7 +82,7 @@ RSpec.describe 'Holdings API', type: :request do
         before { get "#{base_url}#{another_user[:id]}/holdings/#{another_user.holdings.first[:id]}", headers: tokens }
 
         it '権限がなく保有株が取得できないこと' do
-          expect(JSON.parse(response.body)['errors']).to include('Access denied! No match your user id')
+          expect(JSON.parse(response.body)['errors']).to include('Your access denied! No match your user id')
         end
 
         it 'HTTPステータスが401である(アクセス権がない)こと' do
@@ -106,7 +106,26 @@ RSpec.describe 'Holdings API', type: :request do
     end
   end
 
-  describe '#create Action'
+  describe '#create Action' do
+    context '正常' do
+      let(:tokens) { sign_in(params) }
+      let(:params) { { email: user[:email], password: 'password' } }
+      let!(:new_stock) { create(:stock) }
+
+      # 事前にログインしておく
+      before { post 'http://localhost:3000/api/auth', params: params }
+
+      context 'サインイン出来ている場合' do
+        let(:holding_params) { { quantity: 1, user_id: user[:id], stock_id: new_stock[:id] } }
+        # before { post "#{base_url}#{user[:id]}/holdings", headers: tokens, params: holding_params }
+
+        it '新しい株を保有株に新規登録できること' do
+          post "#{base_url}#{user[:id]}/holdings", headers: tokens, params: holding_params
+          expect(JSON.parse(response.body)).to eq('')
+        end
+      end
+    end
+  end
   describe '#update Action'
   describe '#delete Action'
 end
