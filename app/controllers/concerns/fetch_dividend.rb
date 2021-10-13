@@ -1,5 +1,6 @@
 module FetchDividend
   extend ActiveSupport::Concern
+
   included do
     # 個別にdividendを取得するためのインスタンスメソッド
     def fetch_current_dividend

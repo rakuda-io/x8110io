@@ -1,5 +1,5 @@
 require 'rails_helper'
-require 'net/http'
+# require 'webmock/rspec'
 
 # 保有株一覧のJSON出力のテスト
 RSpec.describe 'Holdings API', type: :request do
@@ -110,21 +110,35 @@ RSpec.describe 'Holdings API', type: :request do
     context '正常' do
       let(:tokens) { sign_in(params) }
       let(:params) { { email: user[:email], password: 'password' } }
-      let!(:new_stock) { create(:stock) }
+      # factory_botのstockを実際にスクレイピング出来るデータにオーバーライド
+      let!(:new_stock) { create(:stock,
+        company_name: "SPDR Portfolio S&P 500 High Dividend ETF",
+        ticker_symbol: "SPYD",
+        country: "USA",
+        sector: "Financial",
+        url: "https://finviz.com/quote.ashx?t=SPYD&ty=c&p=d&b=1"
+      ) }
 
       # 事前にログインしておく
       before { post 'http://localhost:3000/api/auth', params: params }
 
       context 'サインイン出来ている場合' do
         let(:holding_params) { { quantity: 1, user_id: user[:id], stock_id: new_stock[:id] } }
-        # before { post "#{base_url}#{user[:id]}/holdings", headers: tokens, params: holding_params }
+        before { post "#{base_url}#{user[:id]}/holdings", headers: tokens, params: holding_params }
 
-        it '新しい株を保有株に新規登録できること' do
-          post "#{base_url}#{user[:id]}/holdings", headers: tokens, params: holding_params
-          expect(JSON.parse(response.body)).to eq('')
+        it 'paramsで送信した通りの株を新規登録できること' do
+          expect(JSON.parse(response.body)['stock']['company_name']).to eq(new_stock[:company_name])
+        end
+
+        it 'paramsで送信した通りの株の現在のdividend(配当金額)が登録出来ていること' do
+          expect(JSON.parse(response.body)['dividend_amount']).to_not be_nil
         end
       end
+
+      context 'サインイン出来ていない場合'
     end
+
+    context '異常'
   end
   describe '#update Action'
   describe '#delete Action'
