@@ -111,13 +111,14 @@ RSpec.describe 'Holdings API', type: :request do
       let(:tokens) { sign_in(params) }
       let(:params) { { email: user[:email], password: 'password' } }
       # factory_botのstockを実際にスクレイピング出来るデータにオーバーライド
-      let!(:new_stock) { create(:stock,
-        company_name: "SPDR Portfolio S&P 500 High Dividend ETF",
-        ticker_symbol: "SPYD",
-        country: "USA",
-        sector: "Financial",
-        url: "https://finviz.com/quote.ashx?t=SPYD&ty=c&p=d&b=1"
-      ) }
+      let!(:new_stock) do
+        create(:stock,
+               company_name: "SPDR Portfolio S&P 500 High Dividend ETF",
+               ticker_symbol: "SPYD",
+               country: "USA",
+               sector: "Financial",
+               url: "https://finviz.com/quote.ashx?t=SPYD&ty=c&p=d&b=1")
+      end
 
       # 事前にログインしておく
       before { post 'http://localhost:3000/api/auth', params: params }
@@ -130,8 +131,12 @@ RSpec.describe 'Holdings API', type: :request do
           expect(JSON.parse(response.body)['stock']['company_name']).to eq(new_stock[:company_name])
         end
 
-        it 'paramsで送信した通りの株の現在のdividend(配当金額)が登録出来ていること' do
-          expect(JSON.parse(response.body)['dividend_amount']).to_not be_nil
+        it '新規登録時に現在のdividend(配当金額)が登録出来ていること' do
+          expect(JSON.parse(response.body)['dividend_amount']).not_to be_nil
+        end
+
+        it 'HTTPステータスが201であること' do
+          expect(response).to have_http_status(:created)
         end
       end
 
@@ -140,6 +145,7 @@ RSpec.describe 'Holdings API', type: :request do
 
     context '異常'
   end
+
   describe '#update Action'
   describe '#delete Action'
 end

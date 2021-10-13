@@ -26,7 +26,7 @@ module Api
       # 同じstock_idが存在しないなら新規登録
       elsif @new_holding.save
         fetch_current_dividend # 現在のdividendを取得
-        render status: :ok, json: @new_holding
+        render status: :created, json: @new_holding
       else
         render status: :unprocessable_entity, json: "You must fill out the fields!!"
       end
