@@ -138,6 +138,10 @@ RSpec.describe 'Holdings API', type: :request do
         it 'HTTPステータスが201であること' do
           expect(response).to have_http_status(:created)
         end
+        # 成功のスタータスコードのテストよりも、新規登録によって件数が1件増えたことをテストするのもあり
+
+        # 作れなかった時
+        #
       end
 
       context 'サインイン出来ていない場合'
