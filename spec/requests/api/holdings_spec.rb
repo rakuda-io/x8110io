@@ -9,12 +9,11 @@ RSpec.describe 'Holdings API', type: :request do
   let!(:user_holdings) { create_list(:holding, 3, user_id: user[:id], stock_id: stock[:id]) }
   let!(:another_user_holdings) { create_list(:holding, 3, user_id: another_user[:id], stock_id: stock[:id]) }
   let(:base_url) { 'http://localhost:3000/api/users/' }
+  let(:tokens) { sign_in(params) }
+  let(:params) { { email: user[:email], password: 'password' } }
 
   describe '#index Action' do
     context '正常' do
-      let(:tokens) { sign_in(params) }
-      let(:params) { { email: user[:email], password: 'password' } }
-
       # 事前にサインインしておく
       before { post 'http://localhost:3000/api/auth', params: params }
 
@@ -60,9 +59,6 @@ RSpec.describe 'Holdings API', type: :request do
 
   describe '#show Action' do
     context '正常' do
-      let(:tokens) { sign_in(params) }
-      let(:params) { { email: user[:email], password: 'password' } }
-
       # 事前にサインインしておく
       before { post 'http://localhost:3000/api/auth', params: params }
 
@@ -107,8 +103,6 @@ RSpec.describe 'Holdings API', type: :request do
   end
 
   describe '#create Action' do
-    let(:tokens) { sign_in(params) }
-    let(:params) { { email: user[:email], password: 'password' } }
     # factory_botのstockを実際にスクレイピング出来るデータにオーバーライド
     let!(:new_stock) do
       create(:stock,
@@ -144,7 +138,7 @@ RSpec.describe 'Holdings API', type: :request do
         # 成功のスタータスコードのテストよりも、新規登録によって件数が1件増えたことをテストするのもあり
         it '新規登録で1件のHoldingテーブルのレコードが増えること' do
           expect{post "#{base_url}#{user[:id]}/holdings", headers: tokens, params: holding_params}
-            .to change{Holding.all.count}.by(+1)
+            .to change{user.holdings.count}.by(+1)
         end
       end
     end
@@ -194,9 +188,6 @@ RSpec.describe 'Holdings API', type: :request do
   end
 
   describe '#update Action' do
-    let(:tokens) { sign_in(params) }
-    let(:params) { { email: user[:email], password: 'password' } }
-
     context '正常' do
       # サインイン
       before { post 'http://localhost:3000/api/auth', params: params }
@@ -246,5 +237,43 @@ RSpec.describe 'Holdings API', type: :request do
     end
   end
 
-  describe '#delete Action'
+  describe '#delete Action' do
+    let(:destroy_holding_id) {user.holdings.first[:id]}
+
+    context '正常' do
+      before { post 'http://localhost:3000/api/auth', params: params }
+
+      context 'レスポンス' do
+        before do
+          delete "#{base_url}#{user[:id]}/holdings/#{destroy_holding_id}", headers: tokens
+        end
+
+        it 'holding削除後の削除したIDのレスポンスが表示されること' do
+          expect(response.body).to eq("Delete holdingID: #{destroy_holding_id}")
+        end
+
+
+        it 'HTTPステータスが200であること' do
+          expect(response).to have_http_status(:ok)
+        end
+      end
+
+      context 'DB側の処理' do
+        it 'holdingが1件減っていること' do
+          expect{delete "#{base_url}#{user[:id]}/holdings/#{destroy_holding_id}", headers: tokens}
+          .to change{user.holdings.count}.by(-1)
+        end
+      end
+    end
+
+    context '異常' do
+      context 'サインインできていない場合' do
+        before { delete "#{base_url}#{user[:id]}/holdings/#{destroy_holding_id}" }
+
+        it '削除できないこと' do
+          expect(JSON.parse(response.body)['errors']).to eq(["You need to sign in or sign up before continuing."])
+        end
+      end
+    end
+  end
 end
