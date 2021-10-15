@@ -18,8 +18,8 @@ module Api
     def create
       @new_holding = @user.holdings.new(holding_params)
       # quantityが未入力なら後々の計算式がエラーになるので早期リターンさせる
-      if @new_holding.quantity == nil
-        return render json: {errors: "You must fill out the fields of Quantity"}, status: :unprocessable_entity
+      if @new_holding.quantity.nil?
+        render json: { errors: "You must fill out the fields of Quantity" }, status: :unprocessable_entity
 
       # 同じstock_idが存在するなら追加・更新
       elsif @new_holding.same_stock_id_exist?
@@ -34,7 +34,7 @@ module Api
 
       else
         # その他の項目が未入力なら
-        render json: {errors: "You must fill out the fields!!"}, status: :unprocessable_entity
+        render json: { errors: "You must fill out the fields!!" }, status: :unprocessable_entity
       end
     end
 
@@ -46,7 +46,7 @@ module Api
         )
         render status: :ok, json: holding
       else
-        render json: {errors: "You must fill out the fields!!"}, status: :unprocessable_entity
+        render json: { errors: "You must fill out the fields!!" }, status: :unprocessable_entity
       end
     end
 

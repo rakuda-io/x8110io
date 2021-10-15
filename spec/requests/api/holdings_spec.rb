@@ -106,12 +106,12 @@ RSpec.describe 'Holdings API', type: :request do
     # factory_botのstockを実際にスクレイピング出来るデータにオーバーライド
     let!(:new_stock) do
       create(:stock,
-        company_name: "SPDR Portfolio S&P 500 High Dividend ETF",
-        ticker_symbol: "SPYD",
-        country: "USA",
-        sector: "Financial",
-        url: "https://finviz.com/quote.ashx?t=SPYD&ty=c&p=d&b=1")
-      end
+             company_name: "SPDR Portfolio S&P 500 High Dividend ETF",
+             ticker_symbol: "SPYD",
+             country: "USA",
+             sector: "Financial",
+             url: "https://finviz.com/quote.ashx?t=SPYD&ty=c&p=d&b=1")
+    end
 
     context '正常' do
       # サインイン
@@ -137,8 +137,8 @@ RSpec.describe 'Holdings API', type: :request do
 
         # 成功のスタータスコードのテストよりも、新規登録によって件数が1件増えたことをテストするのもあり
         it '新規登録で1件のHoldingテーブルのレコードが増えること' do
-          expect{post "#{base_url}#{user[:id]}/holdings", headers: tokens, params: holding_params}
-            .to change{user.holdings.count}.by(+1)
+          expect { post "#{base_url}#{user[:id]}/holdings", headers: tokens, params: holding_params }
+            .to change { user.holdings.count }.by(+1)
         end
       end
     end
@@ -195,8 +195,8 @@ RSpec.describe 'Holdings API', type: :request do
       let(:update_params) { { quantity: 2 } }
 
       it 'update_paramsのquantity分だけholdingのquantityが増加していること' do
-        expect{put "#{base_url}#{user[:id]}/holdings/#{user.holdings.first[:id]}", headers: tokens, params: update_params}
-        .to change{user.holdings.first[:quantity]}.by(update_params[:quantity])
+        expect { put "#{base_url}#{user[:id]}/holdings/#{user.holdings.first[:id]}", headers: tokens, params: update_params }
+          .to change { user.holdings.first[:quantity] }.by(update_params[:quantity])
       end
 
       it 'HTTPステータスが200であること' do
@@ -238,7 +238,7 @@ RSpec.describe 'Holdings API', type: :request do
   end
 
   describe '#delete Action' do
-    let(:destroy_holding_id) {user.holdings.first[:id]}
+    let(:destroy_holding_id) { user.holdings.first[:id] }
 
     context '正常' do
       before { post 'http://localhost:3000/api/auth', params: params }
@@ -252,7 +252,6 @@ RSpec.describe 'Holdings API', type: :request do
           expect(response.body).to eq("Delete holdingID: #{destroy_holding_id}")
         end
 
-
         it 'HTTPステータスが200であること' do
           expect(response).to have_http_status(:ok)
         end
@@ -260,8 +259,8 @@ RSpec.describe 'Holdings API', type: :request do
 
       context 'DB側の処理' do
         it 'holdingが1件減っていること' do
-          expect{delete "#{base_url}#{user[:id]}/holdings/#{destroy_holding_id}", headers: tokens}
-          .to change{user.holdings.count}.by(-1)
+          expect { delete "#{base_url}#{user[:id]}/holdings/#{destroy_holding_id}", headers: tokens }
+            .to change { user.holdings.count }.by(-1)
         end
       end
     end
