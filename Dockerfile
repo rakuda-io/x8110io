@@ -8,9 +8,10 @@ RUN apt-get update -qq && \
   build-essential \
   nodejs \
   mariadb-client \
-  yarn && \
-  apt-get clean && \
-  rm --recursive --force /var/lib/apt/lists/*
+  yarn
+  # && \
+  # apt-get clean && \
+  # rm --recursive --force /var/lib/apt/lists/*
 
 RUN mkdir $APP_ROOT
 WORKDIR $APP_ROOT

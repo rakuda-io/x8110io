@@ -1,0 +1,5 @@
+FROM node:16-alpine
+WORKDIR /usr/src/app
+RUN apk add --update nodejs nodejs-npm
+RUN apk add --no-cache nodejs
+RUN npm config set unsafe-perm true

@@ -29,6 +29,16 @@ services:
       - node_modules:/x8110io/node_modules
       - tmp-data:/x8110io/tmp/sockets
 
+  front:
+    build:
+      context: ./front
+      dockerfile: Dockerfile_front
+    volumes:
+      - ./front:/usr/src/app
+    command: sh -c "cd react-app && yarn start"
+    ports:
+      - "8000:3000"
+
 volumes:
   mysql:
   bundle:
