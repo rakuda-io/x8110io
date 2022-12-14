@@ -1,7 +1,0 @@
-categories:
-  - title: 'Features:'
-    label: 'ToRC'
-exclude-labels:
-  - 'dependencies'
-template: |
-  $CHANGES
